@@ -2,9 +2,12 @@ from dash import Dash, html
 
 import src.components.pokemon_dropdown as pokemon_dropdown
 import src.components.stats_bar_chart as stats_bar_chart
+import src.components.benchmark_dropdown as benchmark_dropdown
+import data.loader as loader
 
 
 def create_layout(app: Dash) -> html.Div:
+    df, type_df = loader.load_pokemon_data()
     return html.Div(
         className="app-div container",
         children=[
@@ -12,8 +15,10 @@ def create_layout(app: Dash) -> html.Div:
             html.H1(app.title),
             html.Hr(),
             html.P("Hello There"),
-            pokemon_dropdown.render(app),
+            pokemon_dropdown.render(app, df),
+            html.Br(),
+            benchmark_dropdown.render(app, type_df),
             html.Hr(),
-            stats_bar_chart.render(app)
+            stats_bar_chart.render(app, df, type_df)
         ]
     )

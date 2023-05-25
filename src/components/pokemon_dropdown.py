@@ -5,11 +5,11 @@ import random
 import pandas as pd
 
 import src.components.ids as ids
+from data.schema import DataSchema as schema
 
 
-def render(app: Dash) -> html.Div:
-    df = pd.read_csv("data/ExampleData.csv", index_col=0)
-    all_pokemon = df["name"]
+def render(app: Dash, df: pd.DataFrame) -> html.Div:
+    all_pokemon = df[schema.NAME]
     dex_number = df.index
 
     @app.callback(
