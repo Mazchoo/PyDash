@@ -1,0 +1,12 @@
+en:
+  pokedex: Pokédex
+  type_benchmark: Type Benchmark
+  hello_there: Hello There
+  stats: Stats
+  base_stats: Base Stats
+  relative: Relative
+  no_image: No Image
+  select_pokemon: Select a Pokémon
+  select_something: Select something dude
+  select_random: Select Random
+  benchmark_average_all: Benchmark will be the average of all pokemon

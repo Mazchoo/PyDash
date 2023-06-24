@@ -1,0 +1,12 @@
+de:
+  pokedex: Pokédex
+  type_benchmark: Typ-Benchmark
+  hello_there: Hallo
+  stats: Stats
+  base_stats: Base Stats
+  relative: Relativ
+  no_image: Kein Bild
+  select_pokemon: Wähle ein Pokémon aus
+  select_something: Wähle etwas aus, Alter
+  select_random: Wählen Sie Zufällig
+  benchmark_average_all: Der Benchmark wird der Durchschnitt aller Pokémon sein

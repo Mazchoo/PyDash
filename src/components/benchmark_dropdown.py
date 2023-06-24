@@ -3,6 +3,7 @@ import pandas as pd
 
 import src.components.ids as ids
 from data.schema import DataSchema as schema
+from src.language import __t__
 
 
 def render(app: Dash, type_df: pd.DataFrame) -> html.Div:
@@ -11,13 +12,13 @@ def render(app: Dash, type_df: pd.DataFrame) -> html.Div:
     return html.Div(
         className="container",
         children=[
-            html.H6("Type benchmark"),
+            html.H6(__t__("general", "type_benchmark")),
             dcc.Dropdown(
                 id=ids.TYPE_DROPDOWN,
-                options=[{"label": k, "value": k} for k in all_types],
+                options=[{"label": __t__("type", k), "value": k} for k in all_types],
                 multi=True,
                 value=all_types,
-                placeholder="Benchmark will be the average of all pokemon (which is not the same as all types)"
+                placeholder=__t__("general", "benchmark_average_all")
             )
         ]
     )

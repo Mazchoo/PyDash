@@ -3,12 +3,14 @@ import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
 import pandas as pd
-from typing import List
 import requests
+
+from typing import List
 
 import src.components.ids as ids
 import src.components.fallback_image as fallback_image
 from data.schema import DataSchema as schema
+from src.language import __t__, LOCALE
 
 
 def get_stat_normalized_columns(df_row: pd.Series, bench_df: pd.DataFrame) -> List[float]:
@@ -16,10 +18,11 @@ def get_stat_normalized_columns(df_row: pd.Series, bench_df: pd.DataFrame) -> Li
 
 
 def generate_title(df_row: pd.Series) -> str:
-    title = f"<b>{df_row[schema.NAME]} #{df_row[schema.POKEDEX_NO]}"
-    title += f" [{df_row[schema.TYPE1]}"
+    title = f"<b>{df_row[schema.GERMAN_NAME if LOCALE == 'de' else schema.NAME]}"
+    title += f" #{df_row[schema.POKEDEX_NO]}"
+    title += f" [{__t__('type', df_row[schema.TYPE1])}"
     if not pd.isnull(df_row[schema.TYPE2]):
-        title += f" / {df_row[schema.TYPE2]}"
+        title += f" / {__t__('type', df_row[schema.TYPE2])}"
     title += f"] <br>{df_row[schema.JAPAN_NAME]}"
     return title
 
@@ -33,8 +36,9 @@ def plot_pokemon_stats(idx: int, df: pd.DataFrame, benchmark_df: pd.DataFrame):
                  color=norm_stats, color_continuous_scale="earth",
                  range_color=(-2, 2), title=title)
 
-    fig.update_layout(xaxis_title="Stats", yaxis_title="Base Stat",
-                      coloraxis_colorbar_title_text="Relative")
+    fig.update_layout(xaxis_title=__t__('general', "stats"),
+                      yaxis_title=__t__('general', "base_stats"),
+                      coloraxis_colorbar_title_text=__t__('general', "relative"))
     return fig
 
 
@@ -54,7 +58,7 @@ def create_bar_chart_for_pokemon(idx: int, df: pd.DataFrame, benchmark_df: pd.Da
     return dbc.Row([
         html.Div(dcc.Graph(figure=fig), className="col"),
         html.Div(
-            html.Img(src=image_url, alt=" No Image", width="80%"),
+            html.Img(src=image_url, alt=" " + __t__('general', "no_image"), width="80%"),
             className="col"
         )
     ])
