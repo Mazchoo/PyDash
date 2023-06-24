@@ -6,12 +6,11 @@ import pandas as pd
 from typing import List
 
 import src.components.ids as ids
-from data.schema import DataSchema as schema
-from src.language import __t__, LOCALE
+from src.language import __t__, get_schema_name
 
 
 def render(app: Dash, df: pd.DataFrame) -> html.Div:
-    all_pokemon = df[schema.GERMAN_NAME if LOCALE == "de" else schema.NAME]
+    all_pokemon = df[get_schema_name()]
     dex_number = df.index
 
     @app.callback(

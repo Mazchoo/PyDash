@@ -10,7 +10,7 @@ from typing import List
 import src.components.ids as ids
 import src.components.fallback_image as fallback_image
 from data.schema import DataSchema as schema
-from src.language import __t__, LOCALE
+from src.language import __t__, get_schema_name
 
 
 def get_stat_normalized_columns(df_row: pd.Series, bench_df: pd.DataFrame) -> List[float]:
@@ -18,7 +18,7 @@ def get_stat_normalized_columns(df_row: pd.Series, bench_df: pd.DataFrame) -> Li
 
 
 def generate_title(df_row: pd.Series) -> str:
-    title = f"<b>{df_row[schema.GERMAN_NAME if LOCALE == 'de' else schema.NAME]}"
+    title = f"<b>{df_row[get_schema_name()]}"
     title += f" #{df_row[schema.POKEDEX_NO]}"
     title += f" [{__t__('type', df_row[schema.TYPE1])}"
     if not pd.isnull(df_row[schema.TYPE2]):
