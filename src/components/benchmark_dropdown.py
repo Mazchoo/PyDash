@@ -1,13 +1,12 @@
 from dash import Dash, html, dcc
-import pandas as pd
 
 import src.components.ids as ids
-from data.schema import DataSchema as schema
 from src.language import __t__
+from data.DataSource import DataSource
 
 
-def render(app: Dash, type_df: pd.DataFrame) -> html.Div:
-    all_types = type_df[schema.TYPE].unique()
+def render(app: Dash, source: DataSource) -> html.Div:
+    all_types = source.get_all_types()
 
     return html.Div(
         className="container",

@@ -9,7 +9,7 @@ from src.language import __t__
 def main():
     app = Dash(external_stylesheets=[BOOTSTRAP])
     app.title = __t__("general", "pokedex")
-    app.layout = create_layout(app)
+    app.layout = create_layout(app, "data/ExampleData.csv")
     app.run()
 
 

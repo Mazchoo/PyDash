@@ -2,37 +2,20 @@ from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
 from dash.dependencies import Input, Output
 import plotly.express as px
-import pandas as pd
-import requests
 
 from typing import List
 
 import src.components.ids as ids
-import src.components.fallback_image as fallback_image
 from data.schema import DataSchema as schema
-from src.language import __t__, get_schema_name
+from src.language import __t__
+from data.DataSource import DataSource
 
 
-def get_stat_normalized_columns(df_row: pd.Series, bench_df: pd.DataFrame) -> List[float]:
-    return [(df_row[s] - bench_df[s]["mean"]) / bench_df[s]["std"] for s in schema.STAT_COLS]
+def plot_pokemon_stats(source: DataSource, idx: int, type_list: List[str]):
+    norm_stats = source.get_stat_normalized_columns(idx, type_list)
+    title = source.generate_title(idx, __t__)
 
-
-def generate_title(df_row: pd.Series) -> str:
-    title = f"<b>{df_row[get_schema_name()]}"
-    title += f" #{df_row[schema.POKEDEX_NO]}"
-    title += f" [{__t__('type', df_row[schema.TYPE1])}"
-    if not pd.isnull(df_row[schema.TYPE2]):
-        title += f" / {__t__('type', df_row[schema.TYPE2])}"
-    title += f"] <br>{df_row[schema.JAPAN_NAME]}"
-    return title
-
-
-def plot_pokemon_stats(idx: int, df: pd.DataFrame, benchmark_df: pd.DataFrame):
-    df_row = df.iloc[idx]
-    norm_stats = get_stat_normalized_columns(df_row, benchmark_df)
-    title = generate_title(df_row)
-
-    fig = px.bar(x=schema.STAT_COLS, y=df_row[schema.STAT_COLS],
+    fig = px.bar(x=schema.STAT_COLS, y=source.get_all_stats(idx),
                  color=norm_stats, color_continuous_scale="earth",
                  range_color=(-2, 2), title=title)
 
@@ -42,18 +25,9 @@ def plot_pokemon_stats(idx: int, df: pd.DataFrame, benchmark_df: pd.DataFrame):
     return fig
 
 
-def get_pokemon_image(pokemon_name: str):
-    image_url = f"https://img.pokemondb.net/artwork/large/{pokemon_name}.jpg"
-
-    if requests.get(image_url).status_code != 200:
-        image_url = fallback_image.IMAGE_FALLBACK
-
-    return image_url
-
-
-def create_bar_chart_for_pokemon(idx: int, df: pd.DataFrame, benchmark_df: pd.DataFrame):
-    fig = plot_pokemon_stats(idx, df, benchmark_df)
-    image_url = get_pokemon_image(df.iloc[idx][schema.NAME].lower())
+def create_stat_bar_chart(source: DataSource, idx: int, type_list: List[str]):
+    fig = plot_pokemon_stats(source, idx, type_list)
+    image_url = source.get_pokemon_image(idx)
 
     return dbc.Row([
         html.Div(dcc.Graph(figure=fig), className="col"),
@@ -64,7 +38,7 @@ def create_bar_chart_for_pokemon(idx: int, df: pd.DataFrame, benchmark_df: pd.Da
     ])
 
 
-def render(app: Dash, df: pd.DataFrame, type_df: pd.DataFrame) -> html.Div:
+def render(app: Dash, source: DataSource) -> html.Div:
 
     @app.callback(
         Output(ids.STAT_BAR_CHART, "children"),
@@ -74,20 +48,12 @@ def render(app: Dash, df: pd.DataFrame, type_df: pd.DataFrame) -> html.Div:
         if selected_pokemon is None:
             return []
 
-        sel_type_df = type_df.loc[type_df[schema.TYPE].isin(type_list)]
-        if sel_type_df.empty:
-            sel_type_df = df
-
-        bench_df = pd.DataFrame.from_dict({
-            s: {"mean": sel_type_df[s].mean(), "std": sel_type_df[s].mean()}
-            for s in schema.STAT_COLS
-        })
-
-        return [create_bar_chart_for_pokemon(i, df, bench_df) for i in selected_pokemon]
+        return [create_stat_bar_chart(source, i, type_list) for i in selected_pokemon]
 
     return html.Div(id=ids.STAT_BAR_CHART)
 
 
 if __name__ == '__main__':
-    fig = plot_pokemon_stats(0)
+    source = DataSource("data/ExampleData.csv")
+    fig = plot_pokemon_stats(source, 0, ["Grass"])
     fig.show()

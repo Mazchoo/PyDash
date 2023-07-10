@@ -3,8 +3,6 @@ from typing import Tuple
 
 from data.schema import DataSchema as schema
 
-DATA_PATH = "data/ExampleData.csv"
-
 
 def get_all_pokemon_of_type(df: pd.DataFrame, find_type: str):
     type_df = df.loc[~pd.isnull(df[find_type])][schema.STAT_COLS + [find_type]]
@@ -17,8 +15,8 @@ def create_type_dataframe(df: pd.DataFrame):
     return pd.concat([type_df_1, type_df_2])
 
 
-def load_pokemon_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    df = pd.read_csv(DATA_PATH, index_col=0)
+def load_pokemon_data(path: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    df = pd.read_csv(path, index_col=0)
 
     for norm_col, col in zip(schema.STAT_NORM_COLS, schema.STAT_COLS):
         df[norm_col] = (df[col] - df[col].mean()) / df[col].std()

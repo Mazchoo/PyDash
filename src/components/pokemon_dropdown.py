@@ -1,17 +1,14 @@
 from dash import Dash, html, dcc
 from dash.dependencies import Input, Output
-import random
-import pandas as pd
 
 from typing import List
 
+from data.DataSource import DataSource
 import src.components.ids as ids
-from src.language import __t__, get_schema_name
+from src.language import __t__
 
 
-def render(app: Dash, df: pd.DataFrame) -> html.Div:
-    all_pokemon = df[get_schema_name()]
-    dex_number = df.index
+def render(app: Dash, source: DataSource) -> html.Div:
 
     @app.callback(
         Output(ids.POKEMON_DROPDOWN, "value"),
@@ -19,7 +16,7 @@ def render(app: Dash, df: pd.DataFrame) -> html.Div:
     )
     def _select_random_pokemon(n_clicks: int) -> List[str]:
         if n_clicks is not None:
-            return [random.choice(dex_number)]
+            return source.get_random_poke_id()
 
     return html.Div(
         className="container",
@@ -27,7 +24,7 @@ def render(app: Dash, df: pd.DataFrame) -> html.Div:
             html.H6(__t__("general", "select_pokemon")),
             dcc.Dropdown(
                 id=ids.POKEMON_DROPDOWN,
-                options=[{"label": k, "value": i} for k, i in zip(all_pokemon, dex_number)],
+                options=source.get_all_pokemon_options(),
                 multi=True,
                 placeholder=__t__("general", "select_something")
             ),
